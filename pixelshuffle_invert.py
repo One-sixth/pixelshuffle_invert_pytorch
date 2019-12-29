@@ -31,16 +31,21 @@ def pixelshuffle_invert(x: torch.Tensor, factor_hw: Tuple[int, int]):
 if __name__ == '__main__':
     import torch.nn.functional as F
 
-    # check function correct
-    x = torch.rand(5, 16, 32, 32)   # BCHW
+    print('Check function correct')
+    print()
 
-    y1 = F.pixel_shuffle(x, 2)
-    y2 = pixelshuffle(x, (2, 2))
+    for s in [1, 2, 4, 8, 16]:
+        print('Checking scale {}'.format(s))
+        x = torch.rand(5, 256, 128, 128)   # BCHW
 
-    assert torch.allclose(y1, y2)
-    print('pixelshuffle works correctly.')
+        y1 = F.pixel_shuffle(x, s)
+        y2 = pixelshuffle(x, (s, s))
 
-    rev_x = pixelshuffle_invert(y1, (2, 2))
+        assert torch.allclose(y1, y2)
+        print('pixelshuffle works correctly.')
 
-    assert torch.allclose(x, rev_x)
-    print('pixelshuffle_invert works correctly.')
+        rev_x = pixelshuffle_invert(y1, (s, s))
+
+        assert torch.allclose(x, rev_x)
+        print('pixelshuffle_invert works correctly.')
+        print()
